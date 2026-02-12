@@ -55,6 +55,14 @@
 			h1.display-2 { font-size: 1.6rem; }
 			.btn-amarillo-tpr { padding: 0.6rem 1rem; font-size: 0.95rem; }
 		}
+
+		/* Navbar collapse custom styling */
+		.navbar-toggler { border: none; }
+		.navbar-toggler-icon { background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba%280,0,0,0.7%29' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E"); }
+		@media (max-width: 991px) {
+			#mainNav { background: #fff; padding: 12px; border-radius: 8px; box-shadow: 0 8px 20px rgba(0,0,0,0.06); }
+			#mainNav .nav-link { display:block; margin-bottom: 8px; }
+		}
 	</style>
 </head>
 <body>
@@ -64,10 +72,22 @@
 			<a class="navbar-brand d-flex align-items-center" href="/">
 				<img src="{% static 'logo/tprlogo.png' %}" alt="TPR Logo" width="120" height="68" style="display: block; object-fit: contain;">
 			</a>
-			<div class="ms-auto d-flex align-items-center">
-				<a href="/" class="btn btn-outline-dark me-2"><i class="bi bi-house-door"></i> Inicio</a>
-				<a href="#" class="btn btn-outline-dark me-2"><i class="bi bi-calendar-check"></i> Reservar</a>
-				<a href="/admin/" class="btn btn-amarillo-tpr fw-bold"><i class="bi bi-person-circle"></i> Acceder</a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+
+			<div class="collapse navbar-collapse" id="mainNav">
+				<ul class="navbar-nav ms-auto mb-2 mb-lg-0 d-flex align-items-center">
+					<li class="nav-item me-2">
+						<a class="nav-link btn btn-outline-dark d-inline-flex align-items-center" href="/"><i class="bi bi-house-door me-1"></i> Inicio</a>
+					</li>
+					<li class="nav-item me-2">
+						<a class="nav-link btn btn-outline-dark d-inline-flex align-items-center" href="#"><i class="bi bi-calendar-check me-1"></i> Reservar</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link btn btn-amarillo-tpr fw-bold d-inline-flex align-items-center" href="/admin/"><i class="bi bi-person-circle me-1"></i> Acceder</a>
+					</li>
+				</ul>
 			</div>
 		</div>
 	</nav>
