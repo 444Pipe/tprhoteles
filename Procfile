@@ -1,1 +1,1 @@
-web: gunicorn cadena_hoteles.wsgi --log-file -
+web: bash start.sh
