@@ -1,0 +1,25 @@
+{% extends "admin/base.html" %}
+{% load static i18n %}
+
+{% block title %}{{ site_title|default:_('TPR Hoteles Admin') }} | {% trans 'Django site admin' %}{% endblock %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'css/admin-custom.css' %}">
+    <style>
+        /* Quitar la imagen de fondo únicamente en las páginas del admin */
+        html, body { background: none !important; }
+        body::before { display: none !important; }
+    </style>
+{% endblock %}
+
+{% block branding %}
+    <a href="{{ site_url|default:'/' }}" class="logo d-flex align-items-center">
+        <img src="{% static 'logo/tprlogo.png' %}" alt="TPR Logo" style="height:34px; display:block; margin-right:10px;">
+        <span style="color:#ffcb2b; font-weight:700;">TPR Hoteles - Administración</span>
+    </a>
+{% endblock %}
+
+{% block nav-global %}
+    {{ block.super }}
+{% endblock %}

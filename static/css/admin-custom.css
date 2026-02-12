@@ -1,0 +1,11 @@
+/* Estilos personalizados para el admin */
+html, body { background: url('../fondo.jpg') center/cover fixed no-repeat; }
+body::before { content: ''; position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: -1; }
+#header, #header + .module { background: rgba(255,255,255,0.03); }
+#content-main { background: transparent; }
+#user-tools a { color: #ffcb2b !important; }
+#branding .logo { color: #ffcb2b; font-weight:700; }
+.login #content-main, .login #content { background: rgba(0,0,0,0.5); border-radius:6px; padding:18px; }
+input, select, textarea { background: rgba(255,255,255,0.06); color: #fff; border:1px solid rgba(255,255,255,0.08); }
+.btn { border-radius:6px; }
+.btn-primary { background: #ffcb2b; border-color: #ffcb2b; color: #222; }

@@ -18,8 +18,11 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from hoteles import views as hoteles_views
 
 urlpatterns = [
+    # Override admin/logout/ to redirect to site index with a message
+    path('admin/logout/', hoteles_views.admin_logout_redirect, name='admin_logout_redirect'),
     path('admin/', admin.site.urls),
     path('', include('hoteles.urls')),
 ]

@@ -16,6 +16,8 @@ def hoteles_list(request):
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Hotel, Municipio, Reserva
 from django import forms
+from django.contrib.auth import logout
+from django.contrib import messages
 
 class ReservaForm(forms.ModelForm):
 	class Meta:
@@ -52,3 +54,15 @@ def reservar(request, hotel_id):
 	else:
 		form = ReservaForm()
 	return render(request, 'reservar.html', {'hotel': hotel, 'form': form})
+
+
+def logout_view(request):
+	logout(request)
+	messages.success(request, 'Sesión cerrada exitosamente.')
+	return redirect('index')
+
+
+def admin_logout_redirect(request):
+	logout(request)
+	messages.success(request, 'Sesión cerrada exitosamente.')
+	return redirect('index')
