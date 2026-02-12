@@ -20,20 +20,7 @@
 		.btn-amarillo-tpr { background: #ffcb2b !important; color: #222 !important; border: none !important; }
 		.btn-amarillo-tpr:hover, .btn-amarillo-tpr:focus { background: #ffd84d !important; color: #222 !important; }
 
-		/* Vertical video */
-		.video-vertical-wrapper { max-width: 360px; margin: 0 auto; }
-		.video-vertical { width: 100%; aspect-ratio: 9/16; overflow: hidden; border-radius: 12px; box-shadow: 0 10px 24px rgba(0,0,0,0.12); }
-		.video-vertical video { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-		.video-vertical { position: relative; background: #000; }
-		.video-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; }
-		.play-circle { width: 68px; height: 68px; border-radius: 50%; background: rgba(255,255,255,0.12); display: inline-block; position: relative; }
-		.play-circle::after { content: ''; position: absolute; left: 25%; top: 20%; width: 0; height: 0; border-left: 18px solid rgba(255,255,255,0.95); border-top: 12px solid transparent; border-bottom: 12px solid transparent; }
-
-		@media (max-width: 767px) {
-			.video-overlay { display: none !important; }
-		}
-		@media (max-width: 767px) { .video-vertical-wrapper { max-width: 100%; } }
 
 		/* Mobile tweaks */
 		@media (max-width: 991px) {
@@ -45,8 +32,7 @@
 			.hero-section .d-flex { flex-direction: column; gap: .75rem; }
 			.hero-section .d-flex a { width: 100%; text-align: center; }
 
-			/* Video and content spacing */
-			.video-vertical-wrapper { margin: 0 auto 1rem; }
+
 			.col-md-6.order-md-2.order-1 { padding-top: 0.5rem; }
 
 			/* Cards adjustments */
@@ -132,34 +118,7 @@
 		</div>
 	</section>
 
-	<!-- Video + Texto (moved to follow '¿Por qué elegirnos?') -->
-	<section class="container py-5">
-		<div class="row g-4 align-items-center">
-			<div class="col-12 col-md-6 order-md-1 order-2">
-				<div class="video-vertical-wrapper">
-					<div class="video-vertical" aria-hidden="false">
-						<video controls playsinline preload="metadata" poster="{% static 'video-poster.jpg' %}" style="background: #000;">
-							<source src="{% static 'video.mp4' %}" type="video/mp4">
-							Tu navegador no soporta la etiqueta de video.
-						</video>
-						<div class="video-overlay d-none d-md-flex" aria-hidden="true">
-							<span class="play-circle"></span>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="col-12 col-md-6 order-md-2 order-1">
-				<h2 class="fw-bold mb-3">Vive TPR: más que una estadía</h2>
-				<p class="lead text-muted">En TPR Hoteles combinamos diseño, comodidad y experiencias locales pensadas para crear recuerdos inolvidables. Mira este breve video y descubre por qué nuestros huéspedes vuelven una y otra vez.</p>
-				<ul class="mb-3">
-					<li>Habitaciones con diseño cuidado y amenidades premium.</li>
-					<li>Ubicación privilegiada cerca de los mejores sitios.</li>
-					<li>Atención personalizada y servicios que simplifican tu viaje.</li>
-				</ul>
-				<a href="{% url 'hoteles_list' %}" class="btn btn-amarillo-tpr btn-lg">Explorar hoteles</a>
-			</div>
-		</div>
-	</section>
+
 
 
 
