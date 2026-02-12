@@ -35,22 +35,30 @@
             <h2 class="fw-bold mb-0" style="color: #222;">Nuestros hoteles</h2>
             <span class="text-muted" style="font-size: 1rem;">Elige tu ciudad y reserva con confianza.</span>
         </div>
-        <form method="get" class="mb-4">
-            <div class="row g-2 align-items-center">
-                <div class="col-auto">
-                    <label for="municipio-select" class="form-label mb-0 fw-semibold">Destino</label>
+
+        <!-- Mobile: show only a single button to go back to home -->
+        <div class="d-block d-md-none text-center mb-4">
+            <a href="/" class="btn btn-amarillo-tpr btn-lg">Volver al inicio</a>
+        </div>
+
+        <!-- Desktop/tablet: form + list (hidden on small screens) -->
+        <div class="d-none d-md-block">
+            <form method="get" class="mb-4">
+                <div class="row g-2 align-items-center">
+                    <div class="col-auto">
+                        <label for="municipio-select" class="form-label mb-0 fw-semibold">Destino</label>
+                    </div>
+                    <div class="col-md-4 col-8">
+                        <select class="form-select" name="municipio" id="municipio-select" onchange="this.form.submit()">
+                            <option value="">Todos los destinos</option>
+                            {% for municipio in municipios %}
+                            <option value="{{ municipio.id }}" {% if municipio.id == municipio_seleccionado %}selected{% endif %}>{{ municipio.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
                 </div>
-                <div class="col-md-4 col-8">
-                    <select class="form-select" name="municipio" id="municipio-select" onchange="this.form.submit()">
-                        <option value="">Todos los destinos</option>
-                        {% for municipio in municipios %}
-                        <option value="{{ municipio.id }}" {% if municipio.id == municipio_seleccionado %}selected{% endif %}>{{ municipio.nombre }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-            </div>
-        </form>
-        <div class="row g-4">
+            </form>
+            <div class="row g-4">
             {% for hotel in hoteles %}
             <div class="col-12 col-md-6 col-lg-4 col-xl-3">
                 <div class="card hotel-card p-0 border-0 shadow-sm" style="background: #fff;">
@@ -80,6 +88,7 @@
                 <div class="alert alert-info text-center">No hay hoteles para este destino.</div>
             </div>
             {% endfor %}
+        </div>
         </div>
     </section>
 </body>
