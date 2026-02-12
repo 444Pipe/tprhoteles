@@ -79,7 +79,13 @@
 			</button>
 
 			<div class="collapse navbar-collapse" id="mainNav">
-				<ul class="navbar-nav ms-auto mb-2 mb-lg-0 d-flex align-items-center">
+				<!-- Mobile: single back-to-home button -->
+				<div class="d-flex d-md-none ms-auto">
+					<a href="/" class="btn btn-amarillo-tpr fw-bold">Volver al inicio</a>
+				</div>
+
+				<!-- Desktop/tablet: original nav -->
+				<ul class="navbar-nav ms-auto mb-2 mb-lg-0 d-none d-md-flex align-items-center">
 					<li class="nav-item me-2">
 						<a class="nav-link btn btn-outline-dark d-inline-flex align-items-center" href="/"><i class="bi bi-house-door me-1"></i> Inicio</a>
 					</li>
