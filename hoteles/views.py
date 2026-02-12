@@ -1,3 +1,16 @@
+def hoteles_list(request):
+	municipios = Municipio.objects.all()
+	municipio_id = request.GET.get('municipio')
+	hoteles = Hotel.objects.all()
+	municipio_seleccionado = None
+	if municipio_id:
+		hoteles = hoteles.filter(municipio_id=municipio_id)
+		municipio_seleccionado = int(municipio_id)
+	return render(request, 'hoteles_list.html', {
+		'municipios': municipios,
+		'hoteles': hoteles,
+		'municipio_seleccionado': municipio_seleccionado
+	})
 
 
 from django.shortcuts import render, get_object_or_404, redirect
