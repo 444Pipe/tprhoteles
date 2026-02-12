@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'hoteles',
 ]
+# Use BigAutoField by default to avoid model warnings
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # ...existing code...
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
