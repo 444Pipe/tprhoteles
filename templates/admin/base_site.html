@@ -6,11 +6,6 @@
 {% block extrahead %}
     {{ block.super }}
     <link rel="stylesheet" href="{% static 'css/admin-custom.css' %}">
-    <style>
-        /* Quitar la imagen de fondo únicamente en las páginas del admin */
-        html, body { background: none !important; }
-        body::before { display: none !important; }
-    </style>
 {% endblock %}
 
 {% block branding %}
