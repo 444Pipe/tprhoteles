@@ -28,7 +28,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-dev-key')
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 # Allow configuring hosts via environment variable (comma separated)
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split(',')
+ALLOWED_HOSTS = [host.strip() for host in os.environ.get('ALLOWED_HOSTS', '*').split(',') if host.strip()]
 
 # Trust reverse proxy HTTPS headers (required on Railway/other PaaS)
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -45,6 +45,25 @@ if csrf_trusted_origins_env:
 railway_public_domain = os.environ.get('RAILWAY_PUBLIC_DOMAIN', '').strip()
 if railway_public_domain:
     CSRF_TRUSTED_ORIGINS.append(f'https://{railway_public_domain}')
+
+# Build trusted origins from known env urls and allowed hosts
+for env_var in ['APP_URL', 'PUBLIC_URL', 'RAILWAY_PUBLIC_DOMAIN']:
+    value = os.environ.get(env_var, '').strip()
+    if not value:
+        continue
+    if value.startswith('http://') or value.startswith('https://'):
+        CSRF_TRUSTED_ORIGINS.append(value.rstrip('/'))
+    else:
+        CSRF_TRUSTED_ORIGINS.append(f'https://{value}')
+
+for host in ALLOWED_HOSTS:
+    if host in ['*', 'localhost', '127.0.0.1', '[::1]']:
+        continue
+    clean_host = host.lstrip('.')
+    CSRF_TRUSTED_ORIGINS.append(f'https://{clean_host}')
+
+# Railway wildcard for generated public domains
+CSRF_TRUSTED_ORIGINS.append('https://*.up.railway.app')
 
 # Avoid duplicate entries while preserving order
 CSRF_TRUSTED_ORIGINS = list(dict.fromkeys(CSRF_TRUSTED_ORIGINS))
