@@ -10,7 +10,40 @@
     <style>
         body { background: #f5f6f8; }
         .top-card { background: #fff; border: 0; border-radius: 14px; box-shadow: 0 8px 22px rgba(0,0,0,.06); }
-        .gallery-main { height: 360px; object-fit: cover; width: 100%; border-radius: 10px; }
+        .hero-image-wrap { position: relative; border-radius: 10px; overflow: hidden; }
+        .gallery-main { height: 360px; object-fit: cover; width: 100%; border-radius: 10px; filter: saturate(.92); }
+        .hero-image-wrap::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(248, 249, 250, .18) 0%, rgba(248, 249, 250, .55) 52%, rgba(248, 249, 250, .88) 100%);
+            pointer-events: none;
+            z-index: 1;
+        }
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            text-align: center;
+            padding: 1.2rem;
+        }
+        .hero-title {
+            font-size: clamp(1.6rem, 4vw, 3rem);
+            font-weight: 800;
+            color: #071a40;
+            margin: 0;
+            text-shadow: 0 2px 6px rgba(255,255,255,.45);
+        }
+        .hero-subtitle {
+            margin-top: .35rem;
+            color: #9c6b26;
+            font-size: clamp(.95rem, 1.8vw, 1.35rem);
+            font-weight: 600;
+        }
         .gallery-thumb { height: 174px; object-fit: cover; width: 100%; border-radius: 10px; }
         .room-carousel .carousel-item img { height: 170px; object-fit: cover; width: 100%; }
         .room-carousel .carousel-control-prev,
@@ -39,13 +72,19 @@
         </div>
 
         <div class="top-card card p-3 p-md-4 mb-3">
-            {% if hotel.imagen_static_url %}
-            <img src="{{ hotel.imagen_static_url }}" alt="{{ hotel.nombre }}" class="gallery-main">
-            {% elif hotel.imagen %}
-            <img src="{{ hotel.imagen.url }}" alt="{{ hotel.nombre }}" class="gallery-main">
-            {% else %}
-            <img src="https://via.placeholder.com/1200x650?text=Hotel" alt="{{ hotel.nombre }}" class="gallery-main">
-            {% endif %}
+            <div class="hero-image-wrap">
+                {% if hotel.imagen_static_url %}
+                <img src="{{ hotel.imagen_static_url }}" alt="{{ hotel.nombre }}" class="gallery-main">
+                {% elif hotel.imagen %}
+                <img src="{{ hotel.imagen.url }}" alt="{{ hotel.nombre }}" class="gallery-main">
+                {% else %}
+                <img src="https://via.placeholder.com/1200x650?text=Hotel" alt="{{ hotel.nombre }}" class="gallery-main">
+                {% endif %}
+                <div class="hero-overlay">
+                    <h1 class="hero-title">{{ hotel.nombre }}</h1>
+                    <div class="hero-subtitle">{{ hotel.tipo }} • {{ hotel.municipio.nombre }}</div>
+                </div>
+            </div>
         </div>
 
         <div class="top-card card p-3 p-md-4 mb-3">
