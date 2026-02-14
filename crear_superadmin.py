@@ -8,10 +8,10 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
-# Cambia estos valores por los que desees
-username = 'admin'
-email = 'delgadofelipe315@gmail.com'
-password = 'admin1234'
+# Credenciales configurables por variables de entorno
+username = os.environ.get('ADMIN_USERNAME', 'admin')
+email = os.environ.get('ADMIN_EMAIL', 'admin@tprhoteles.com')
+password = os.environ.get('ADMIN_PASSWORD', 'admin1234')
 
 user, created = User.objects.get_or_create(
     username=username,
