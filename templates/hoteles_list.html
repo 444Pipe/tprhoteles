@@ -67,7 +67,9 @@
             <div class="col-12 col-md-6 col-lg-4 col-xl-3">
                 <div class="card hotel-card p-0 border-0 shadow-sm" style="background: #fff;">
                     <div class="position-relative">
-                        {% if hotel.imagen %}
+                        {% if hotel.imagen_static %}
+                        <img src="{% static hotel.imagen_static %}" class="card-img-top hotel-img" alt="{{ hotel.nombre }}">
+                        {% elif hotel.imagen %}
                         <img src="{{ hotel.imagen.url }}" class="card-img-top hotel-img" alt="{{ hotel.nombre }}">
                         {% else %}
                         <img src="https://via.placeholder.com/400x180?text=Hotel" class="card-img-top hotel-img" alt="{{ hotel.nombre }}">

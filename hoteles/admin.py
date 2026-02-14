@@ -7,7 +7,7 @@ class MunicipioAdmin(admin.ModelAdmin):
 
 @admin.register(Hotel)
 class HotelAdmin(admin.ModelAdmin):
-	list_display = ('nombre', 'tipo', 'municipio', 'direccion')
+	list_display = ('nombre', 'tipo', 'municipio', 'direccion', 'imagen_static')
 	search_fields = ('nombre', 'municipio__nombre')
 	list_filter = ('municipio', 'tipo')
 

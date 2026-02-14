@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -10,7 +11,9 @@
     <div class="container py-4">
         <a href="/" class="btn btn-link">&larr; Volver</a>
         <div class="card mx-auto" style="max-width: 600px;">
-            {% if hotel.imagen %}
+            {% if hotel.imagen_static %}
+            <img src="{% static hotel.imagen_static %}" class="card-img-top" alt="{{ hotel.nombre }}">
+            {% elif hotel.imagen %}
             <img src="{{ hotel.imagen.url }}" class="card-img-top" alt="{{ hotel.nombre }}">
             {% endif %}
             <div class="card-body">

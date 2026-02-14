@@ -14,6 +14,7 @@ class Hotel(models.Model):
 	municipio = models.ForeignKey(Municipio, on_delete=models.CASCADE)
 	direccion = models.CharField(max_length=200)
 	descripcion = models.TextField()
+	imagen_static = models.CharField(max_length=255, blank=True, default='')
 	imagen = models.ImageField(upload_to='hoteles/', blank=True, null=True)
 
 	def __str__(self):
