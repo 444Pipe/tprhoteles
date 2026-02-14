@@ -63,7 +63,11 @@ class Reserva(models.Model):
 	nombre_cliente = models.CharField(max_length=100)
 	email = models.EmailField()
 	fecha = models.DateField()
+	fecha_salida = models.DateField(blank=True, null=True)
 	personas = models.PositiveIntegerField()
+	habitaciones = models.PositiveIntegerField(default=1)
+	telefono = models.CharField(max_length=30, blank=True, default='')
+	observaciones = models.TextField(blank=True, default='')
 	estado = models.CharField(max_length=20, default='Pendiente')
 	creada = models.DateTimeField(auto_now_add=True)
 

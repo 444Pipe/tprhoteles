@@ -25,7 +25,7 @@ class HotelAdmin(admin.ModelAdmin):
 
 @admin.register(Reserva)
 class ReservaAdmin(admin.ModelAdmin):
-	list_display = ('hotel', 'nombre_cliente', 'email', 'fecha', 'personas', 'estado', 'creada')
+	list_display = ('hotel', 'nombre_cliente', 'email', 'fecha', 'fecha_salida', 'personas', 'habitaciones', 'telefono', 'estado', 'creada')
 	search_fields = ('nombre_cliente', 'hotel__nombre')
 	list_filter = ('estado', 'hotel')
 

@@ -5,6 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reservar</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <style>
+        body { background: #f6f7fb; }
+        .booking-card { border: 0; border-radius: 18px; box-shadow: 0 16px 38px rgba(0, 0, 0, .08); }
+        .booking-title { font-weight: 700; letter-spacing: .2px; }
+        .form-label { font-weight: 500; color: #b2702b; }
+        .field-error { font-size: .85rem; }
+        .info-chip { background: #f0f4ff; color: #35539a; border-radius: 999px; font-size: .8rem; padding: .25rem .7rem; }
+        .summary-box { background: #f9fbff; border: 1px solid #e9eefc; border-radius: 12px; }
+    </style>
 </head>
 <body>
     {% load static %}
@@ -20,39 +30,200 @@
             </div>
         </div>
     </nav>
-    <div class="form-reserva mx-auto mt-5" style="max-width: 480px; background: #fff; border-radius: 16px; box-shadow: 0 2px 16px #0001; padding: 2rem;">
-        {% if hotel %}
-        <h2 class="fw-bold mb-4 text-center">Reserva en {{ hotel.nombre }}</h2>
-        {% else %}
-        <h2 class="fw-bold mb-4 text-center">Reserva general</h2>
-        {% endif %}
-        <form method="post">
+    <div class="container py-4 py-md-5">
+        <div class="card booking-card p-3 p-md-4">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div>
+                    <h2 class="booking-title mb-1">Reserva tu estadía</h2>
+                    {% if hotel %}
+                    <span class="info-chip"><i class="bi bi-building me-1"></i>{{ hotel.nombre }}</span>
+                    {% else %}
+                    <span class="info-chip"><i class="bi bi-calendar-check me-1"></i>Reserva general</span>
+                    {% endif %}
+                </div>
+                <a href="{% if hotel %}{% url 'hotel_detail' hotel.id %}{% else %}/{% endif %}" class="btn btn-light border" aria-label="Cerrar">
+                    <i class="bi bi-x-lg"></i>
+                </a>
+            </div>
+
+            <form method="post" novalidate>
             {% csrf_token %}
-            {% if not hotel %}
-            <div class="mb-3">
-                <label for="hotel" class="form-label">Hotel</label>
-                {{ form.hotel }}
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger" role="alert">
+                {% for error in form.non_field_errors %}
+                <div>{{ error }}</div>
+                {% endfor %}
             </div>
             {% endif %}
-            <div class="mb-3">
-                <label for="nombre_cliente" class="form-label">Nombre completo</label>
-                {{ form.nombre_cliente }}
+
+            <div class="row g-3">
+                <div class="col-12 col-md-6">
+                    <label for="hotel" class="form-label">Hotel</label>
+                    {% if hotel %}
+                    <input type="text" class="form-control" value="{{ hotel.nombre }}" readonly>
+                    {% else %}
+                    <select id="hotel" name="hotel" class="form-select" required>
+                        <option value="">Selecciona un hotel</option>
+                        {% for hotel_opt in hoteles_disponibles %}
+                        <option value="{{ hotel_opt.id }}"
+                                data-ciudad="{{ hotel_opt.municipio.nombre }}"
+                                {% if form.hotel.value|stringformat:"s" == hotel_opt.id|stringformat:"s" %}selected{% endif %}>
+                            {{ hotel_opt.nombre }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    {% for error in form.hotel.errors %}
+                    <div class="text-danger field-error mt-1">{{ error }}</div>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+
+                <div class="col-12 col-md-6">
+                    <label for="ciudad" class="form-label">Ciudad</label>
+                    <input type="text" id="ciudad" class="form-control" value="{% if hotel %}{{ hotel.municipio.nombre }}{% endif %}" readonly>
+                </div>
+
+                <div class="col-12 col-md-6">
+                    <label for="{{ form.fecha.id_for_label }}" class="form-label">Check-in</label>
+                    {{ form.fecha }}
+                    {% for error in form.fecha.errors %}
+                    <div class="text-danger field-error mt-1">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="col-12 col-md-6">
+                    <label for="{{ form.fecha_salida.id_for_label }}" class="form-label">Check-out</label>
+                    {{ form.fecha_salida }}
+                    {% for error in form.fecha_salida.errors %}
+                    <div class="text-danger field-error mt-1">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="col-12 col-md-6">
+                    <label for="{{ form.personas.id_for_label }}" class="form-label">Huéspedes</label>
+                    {{ form.personas }}
+                    {% for error in form.personas.errors %}
+                    <div class="text-danger field-error mt-1">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="col-12 col-md-6">
+                    <label for="{{ form.habitaciones.id_for_label }}" class="form-label">Habitaciones</label>
+                    {{ form.habitaciones }}
+                    {% for error in form.habitaciones.errors %}
+                    <div class="text-danger field-error mt-1">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="col-12 col-md-6">
+                    <label for="{{ form.nombre_cliente.id_for_label }}" class="form-label">Nombre completo</label>
+                    {{ form.nombre_cliente }}
+                    {% for error in form.nombre_cliente.errors %}
+                    <div class="text-danger field-error mt-1">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="col-12 col-md-6">
+                    <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
+                    {{ form.email }}
+                    {% for error in form.email.errors %}
+                    <div class="text-danger field-error mt-1">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="col-12 col-md-6">
+                    <label for="{{ form.telefono.id_for_label }}" class="form-label">Teléfono</label>
+                    {{ form.telefono }}
+                    {% for error in form.telefono.errors %}
+                    <div class="text-danger field-error mt-1">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="col-12">
+                    <label for="{{ form.observaciones.id_for_label }}" class="form-label">Observaciones</label>
+                    {{ form.observaciones }}
+                    {% for error in form.observaciones.errors %}
+                    <div class="text-danger field-error mt-1">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="col-12">
+                    <div class="summary-box p-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div class="small text-muted mb-0">Duración estimada</div>
+                        <div class="fw-semibold" id="estadiaResumen">Selecciona fechas para calcular noches</div>
+                    </div>
+                </div>
+
+                <div class="col-12 d-flex justify-content-end gap-2 mt-2">
+                    <a href="{% if hotel %}{% url 'hotel_detail' hotel.id %}{% else %}/{% endif %}" class="btn btn-light border">Cancelar</a>
+                    <button type="submit" class="btn btn-primary fw-bold px-4">Confirmar reserva</button>
+                </div>
             </div>
-            <div class="mb-3">
-                <label for="email" class="form-label">Correo electrónico</label>
-                {{ form.email }}
-            </div>
-            <div class="mb-3">
-                <label for="fecha" class="form-label">Fecha de reserva</label>
-                {{ form.fecha }}
-            </div>
-            <div class="mb-3">
-                <label for="personas" class="form-label">Número de personas</label>
-                {{ form.personas }}
-            </div>
-            <button type="submit" class="btn btn-amarillo-tpr w-100 fw-bold">Reservar</button>
-        </form>
+            </form>
+        </div>
     </div>
+
+    <script>
+        (function () {
+            const hotelSelect = document.getElementById('hotel');
+            const ciudadInput = document.getElementById('ciudad');
+            const checkInInput = document.getElementById('{{ form.fecha.id_for_label }}');
+            const checkOutInput = document.getElementById('{{ form.fecha_salida.id_for_label }}');
+            const resumen = document.getElementById('estadiaResumen');
+
+            function actualizarCiudad() {
+                if (!hotelSelect || !ciudadInput) return;
+                const selected = hotelSelect.options[hotelSelect.selectedIndex];
+                ciudadInput.value = selected ? (selected.dataset.ciudad || '') : '';
+            }
+
+            function actualizarCheckoutMin() {
+                if (!checkInInput || !checkOutInput || !checkInInput.value) return;
+                const checkInDate = new Date(checkInInput.value + 'T00:00:00');
+                checkInDate.setDate(checkInDate.getDate() + 1);
+                const minDate = checkInDate.toISOString().split('T')[0];
+                checkOutInput.min = minDate;
+                if (checkOutInput.value && checkOutInput.value <= checkInInput.value) {
+                    checkOutInput.value = minDate;
+                }
+            }
+
+            function actualizarResumenNoches() {
+                if (!checkInInput || !checkOutInput || !resumen) return;
+                if (!checkInInput.value || !checkOutInput.value) {
+                    resumen.textContent = 'Selecciona fechas para calcular noches';
+                    return;
+                }
+                const inDate = new Date(checkInInput.value + 'T00:00:00');
+                const outDate = new Date(checkOutInput.value + 'T00:00:00');
+                const diff = Math.round((outDate - inDate) / (1000 * 60 * 60 * 24));
+                if (diff > 0) {
+                    resumen.textContent = diff + ' noche' + (diff > 1 ? 's' : '');
+                } else {
+                    resumen.textContent = 'Revisa las fechas seleccionadas';
+                }
+            }
+
+            if (hotelSelect) {
+                hotelSelect.addEventListener('change', actualizarCiudad);
+                actualizarCiudad();
+            }
+
+            if (checkInInput) {
+                checkInInput.addEventListener('change', function () {
+                    actualizarCheckoutMin();
+                    actualizarResumenNoches();
+                });
+            }
+
+            if (checkOutInput) {
+                checkOutInput.addEventListener('change', actualizarResumenNoches);
+            }
+
+            actualizarCheckoutMin();
+            actualizarResumenNoches();
+        })();
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

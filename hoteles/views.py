@@ -1,10 +1,13 @@
 from urllib.parse import quote
+from datetime import timedelta
 
 from django.conf import settings
 from django.shortcuts import render, get_object_or_404, redirect
 from django import forms
+from django.core.exceptions import ValidationError
 from django.contrib.auth import logout
 from django.contrib import messages
+from django.utils import timezone
 
 from .models import Hotel, Municipio, Reserva
 
@@ -51,17 +54,173 @@ def hoteles_list(request):
 class ReservaForm(forms.ModelForm):
 	class Meta:
 		model = Reserva
-		fields = ['nombre_cliente', 'email', 'fecha', 'personas']
+		fields = ['fecha', 'fecha_salida', 'personas', 'habitaciones', 'nombre_cliente', 'email', 'telefono', 'observaciones']
+		widgets = {
+			'nombre_cliente': forms.TextInput(attrs={
+				'class': 'form-control',
+				'placeholder': 'Tu nombre',
+			}),
+			'email': forms.EmailInput(attrs={
+				'class': 'form-control',
+				'placeholder': 'tu@email.com',
+			}),
+			'telefono': forms.TextInput(attrs={
+				'class': 'form-control',
+				'placeholder': '+57 3xx xxx xxxx',
+			}),
+			'fecha': forms.DateInput(attrs={
+				'class': 'form-control',
+				'type': 'date',
+			}),
+			'fecha_salida': forms.DateInput(attrs={
+				'class': 'form-control',
+				'type': 'date',
+			}),
+			'personas': forms.NumberInput(attrs={
+				'class': 'form-control',
+				'min': 1,
+				'max': 20,
+				'value': 2,
+			}),
+			'habitaciones': forms.NumberInput(attrs={
+				'class': 'form-control',
+				'min': 1,
+				'max': 10,
+				'value': 1,
+			}),
+			'observaciones': forms.Textarea(attrs={
+				'class': 'form-control',
+				'rows': 3,
+				'placeholder': 'Preferencias de cama, hora de llegada, etc.',
+			}),
+		}
+
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		hoy = timezone.localdate()
+		self.fields['fecha'].widget.attrs['min'] = hoy.isoformat()
+		self.fields['fecha_salida'].widget.attrs['min'] = (hoy + timedelta(days=1)).isoformat()
+
+	def clean_fecha(self):
+		fecha = self.cleaned_data.get('fecha')
+		hoy = timezone.localdate()
+		max_fecha = hoy + timedelta(days=365)
+		if fecha and fecha < hoy:
+			raise ValidationError('La fecha de reserva no puede ser anterior a hoy.')
+		if fecha and fecha > max_fecha:
+			raise ValidationError('La fecha de reserva no puede superar 1 año desde hoy.')
+		return fecha
+
+	def clean(self):
+		cleaned_data = super().clean()
+		fecha_entrada = cleaned_data.get('fecha')
+		fecha_salida = cleaned_data.get('fecha_salida')
+		if fecha_entrada and fecha_salida and fecha_salida <= fecha_entrada:
+			self.add_error('fecha_salida', 'El check-out debe ser posterior al check-in.')
+		return cleaned_data
+
+	def clean_personas(self):
+		personas = self.cleaned_data.get('personas')
+		if personas is None or personas < 1:
+			raise ValidationError('Debe reservar para al menos 1 persona.')
+		if personas > 20:
+			raise ValidationError('El máximo permitido por reserva es 20 personas.')
+		return personas
+
+	def clean_habitaciones(self):
+		habitaciones = self.cleaned_data.get('habitaciones')
+		if habitaciones is None or habitaciones < 1:
+			raise ValidationError('Debe seleccionar al menos 1 habitación.')
+		if habitaciones > 10:
+			raise ValidationError('El máximo permitido por reserva es 10 habitaciones.')
+		return habitaciones
 
 
 class ReservaGeneralForm(forms.ModelForm):
 	class Meta:
 		model = Reserva
-		fields = ['hotel', 'nombre_cliente', 'email', 'fecha', 'personas']
+		fields = ['hotel', 'fecha', 'fecha_salida', 'personas', 'habitaciones', 'nombre_cliente', 'email', 'telefono', 'observaciones']
+		widgets = {
+			'hotel': forms.Select(attrs={'class': 'form-select'}),
+			'nombre_cliente': forms.TextInput(attrs={
+				'class': 'form-control',
+				'placeholder': 'Tu nombre',
+			}),
+			'email': forms.EmailInput(attrs={
+				'class': 'form-control',
+				'placeholder': 'tu@email.com',
+			}),
+			'telefono': forms.TextInput(attrs={
+				'class': 'form-control',
+				'placeholder': '+57 3xx xxx xxxx',
+			}),
+			'fecha': forms.DateInput(attrs={
+				'class': 'form-control',
+				'type': 'date',
+			}),
+			'fecha_salida': forms.DateInput(attrs={
+				'class': 'form-control',
+				'type': 'date',
+			}),
+			'personas': forms.NumberInput(attrs={
+				'class': 'form-control',
+				'min': 1,
+				'max': 20,
+				'value': 2,
+			}),
+			'habitaciones': forms.NumberInput(attrs={
+				'class': 'form-control',
+				'min': 1,
+				'max': 10,
+				'value': 1,
+			}),
+			'observaciones': forms.Textarea(attrs={
+				'class': 'form-control',
+				'rows': 3,
+				'placeholder': 'Preferencias de cama, hora de llegada, etc.',
+			}),
+		}
 
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 		self.fields['hotel'].queryset = Hotel.objects.all().order_by('nombre')
+		hoy = timezone.localdate()
+		self.fields['fecha'].widget.attrs['min'] = hoy.isoformat()
+		self.fields['fecha_salida'].widget.attrs['min'] = (hoy + timedelta(days=1)).isoformat()
+
+	def clean_fecha(self):
+		fecha = self.cleaned_data.get('fecha')
+		hoy = timezone.localdate()
+		max_fecha = hoy + timedelta(days=365)
+		if fecha and fecha < hoy:
+			raise ValidationError('La fecha de reserva no puede ser anterior a hoy.')
+		if fecha and fecha > max_fecha:
+			raise ValidationError('La fecha de reserva no puede superar 1 año desde hoy.')
+		return fecha
+
+	def clean(self):
+		cleaned_data = super().clean()
+		fecha_entrada = cleaned_data.get('fecha')
+		fecha_salida = cleaned_data.get('fecha_salida')
+		if fecha_entrada and fecha_salida and fecha_salida <= fecha_entrada:
+			self.add_error('fecha_salida', 'El check-out debe ser posterior al check-in.')
+		return cleaned_data
+
+	def clean_personas(self):
+		personas = self.cleaned_data.get('personas')
+		if personas is None or personas < 1:
+			raise ValidationError('Debe reservar para al menos 1 persona.')
+		if personas > 20:
+			raise ValidationError('El máximo permitido por reserva es 20 personas.')
+		return personas
+
+	def clean_habitaciones(self):
+		habitaciones = self.cleaned_data.get('habitaciones')
+		if habitaciones is None or habitaciones < 1:
+			raise ValidationError('Debe seleccionar al menos 1 habitación.')
+		if habitaciones > 10:
+			raise ValidationError('El máximo permitido por reserva es 10 habitaciones.')
+		return habitaciones
 
 def index(request):
 	municipios = Municipio.objects.all()
@@ -130,6 +289,7 @@ def reservar(request, hotel_id):
 
 
 def reservar_general(request):
+	hoteles_disponibles = Hotel.objects.select_related('municipio').all().order_by('nombre')
 	if request.method == 'POST':
 		form = ReservaGeneralForm(request.POST)
 		if form.is_valid():
@@ -137,7 +297,7 @@ def reservar_general(request):
 			return render(request, 'reserva_exitosa.html', {'hotel': reserva.hotel, 'reserva': reserva})
 	else:
 		form = ReservaGeneralForm()
-	return render(request, 'reservar.html', {'hotel': None, 'form': form})
+	return render(request, 'reservar.html', {'hotel': None, 'form': form, 'hoteles_disponibles': hoteles_disponibles})
 
 
 def logout_view(request):

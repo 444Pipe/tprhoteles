@@ -11,6 +11,13 @@
         <div class="alert alert-success">
             <h2>¡Reserva realizada con éxito!</h2>
             <p>Gracias por reservar en <strong>{{ hotel.nombre }}</strong>.</p>
+            <hr>
+            <p class="mb-1"><strong>Check-in:</strong> {{ reserva.fecha }}</p>
+            {% if reserva.fecha_salida %}
+            <p class="mb-1"><strong>Check-out:</strong> {{ reserva.fecha_salida }}</p>
+            {% endif %}
+            <p class="mb-1"><strong>Huéspedes:</strong> {{ reserva.personas }}</p>
+            <p class="mb-3"><strong>Habitaciones:</strong> {{ reserva.habitaciones }}</p>
             <a href="/" class="btn btn-primary mt-3">Volver al inicio</a>
         </div>
     </div>
