@@ -30,6 +30,25 @@ DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 # Allow configuring hosts via environment variable (comma separated)
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split(',')
 
+# Trust reverse proxy HTTPS headers (required on Railway/other PaaS)
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
+
+# CSRF trusted origins for production/admin login
+CSRF_TRUSTED_ORIGINS = []
+csrf_trusted_origins_env = os.environ.get('CSRF_TRUSTED_ORIGINS', '')
+if csrf_trusted_origins_env:
+    CSRF_TRUSTED_ORIGINS.extend(
+        [origin.strip() for origin in csrf_trusted_origins_env.split(',') if origin.strip()]
+    )
+
+railway_public_domain = os.environ.get('RAILWAY_PUBLIC_DOMAIN', '').strip()
+if railway_public_domain:
+    CSRF_TRUSTED_ORIGINS.append(f'https://{railway_public_domain}')
+
+# Avoid duplicate entries while preserving order
+CSRF_TRUSTED_ORIGINS = list(dict.fromkeys(CSRF_TRUSTED_ORIGINS))
+
 
 # Application definition
 
