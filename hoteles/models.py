@@ -38,6 +38,26 @@ class Hotel(models.Model):
 		return self.nombre
 
 
+class Habitacion(models.Model):
+	hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='habitaciones')
+	nombre = models.CharField(max_length=120)
+	descripcion = models.TextField(blank=True, default='')
+	precio = models.DecimalField(max_digits=10, decimal_places=2)
+	capacidad = models.PositiveIntegerField(default=2)
+	camas = models.CharField(max_length=120, blank=True, default='')
+	metros_cuadrados = models.PositiveIntegerField(blank=True, null=True)
+	incluye_desayuno = models.BooleanField(default=False)
+	estacionamiento = models.BooleanField(default=False)
+	imagen_static = models.CharField(max_length=255, blank=True, default='')
+	activa = models.BooleanField(default=True)
+
+	class Meta:
+		ordering = ['precio', 'nombre']
+
+	def __str__(self):
+		return f"{self.nombre} - {self.hotel.nombre}"
+
+
 class Reserva(models.Model):
 	hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE)
 	nombre_cliente = models.CharField(max_length=100)

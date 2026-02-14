@@ -73,7 +73,10 @@ def index(request):
 def hotel_detail(request, hotel_id):
 	hotel = get_object_or_404(Hotel, id=hotel_id)
 	hotel.imagen_static_url = _build_static_image_url(hotel.imagen_static)
-	return render(request, 'hotel_detail.html', {'hotel': hotel})
+	habitaciones = list(hotel.habitaciones.filter(activa=True))
+	for habitacion in habitaciones:
+		habitacion.imagen_static_url = _build_static_image_url(habitacion.imagen_static)
+	return render(request, 'hotel_detail.html', {'hotel': hotel, 'habitaciones': habitaciones})
 
 def reservar(request, hotel_id):
 	hotel = get_object_or_404(Hotel, id=hotel_id)

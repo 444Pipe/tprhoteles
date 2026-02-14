@@ -4,41 +4,191 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detalle del Hotel</title>
+    <title>{{ hotel.nombre }}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <style>
+        body { background: #f7f8fa; }
+        .hero-card { border: 0; border-radius: 18px; overflow: hidden; box-shadow: 0 10px 28px rgba(0,0,0,.08); }
+        .hero-img { height: 320px; object-fit: cover; }
+        .chip { border-radius: 999px; padding: .3rem .75rem; background: #fff8df; color: #5f4c00; font-size: .85rem; font-weight: 600; }
+        .room-card { border: 0; border-radius: 14px; box-shadow: 0 6px 18px rgba(0,0,0,.06); overflow: hidden; transition: transform .2s ease, box-shadow .2s ease; }
+        .room-card:hover { transform: translateY(-3px); box-shadow: 0 10px 22px rgba(0,0,0,.08); }
+        .room-img { height: 170px; object-fit: cover; }
+        .price { font-size: 1.25rem; font-weight: 700; color: #212529; }
+        .filter-wrap { background: #fff; border-radius: 12px; box-shadow: 0 4px 14px rgba(0,0,0,.05); }
+        .map-card { border: 0; border-radius: 14px; overflow: hidden; box-shadow: 0 8px 20px rgba(0,0,0,.06); }
+    </style>
 </head>
 <body>
-    <div class="container py-4">
-        <a href="/" class="btn btn-link">&larr; Volver</a>
-        <div class="card mx-auto" style="max-width: 600px;">
+    <div class="container py-4 py-md-5">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <a href="{% url 'hoteles_list' %}" class="btn btn-outline-dark"><i class="bi bi-arrow-left me-2"></i>Volver a hoteles</a>
+            <a href="{% url 'reservar' hotel.id %}" class="btn btn-warning fw-bold">Reservar este hotel</a>
+        </div>
+
+        <div class="hero-card card mb-4">
             {% if hotel.imagen_static_url %}
-            <img src="{{ hotel.imagen_static_url }}" class="card-img-top" alt="{{ hotel.nombre }}">
+            <img src="{{ hotel.imagen_static_url }}" class="card-img-top hero-img" alt="{{ hotel.nombre }}">
             {% elif hotel.imagen %}
-            <img src="{{ hotel.imagen.url }}" class="card-img-top" alt="{{ hotel.nombre }}">
+            <img src="{{ hotel.imagen.url }}" class="card-img-top hero-img" alt="{{ hotel.nombre }}">
             {% endif %}
             <div class="card-body">
-                <h2 class="card-title">{{ hotel.nombre }}</h2>
-                <p class="card-text">{{ hotel.tipo }}</p>
-                <p class="card-text"><strong>Dirección:</strong> {{ hotel.direccion }}</p>
-                <p class="card-text">{{ hotel.descripcion }}</p>
-                {% if hotel.mapa_embed_src %}
-                <div class="mt-4">
-                    <h5 class="mb-3">Ubicación</h5>
-                    <iframe
-                        src="{{ hotel.mapa_embed_src }}"
-                        width="100%"
-                        height="320"
-                        style="border:0; border-radius: 10px;"
-                        allowfullscreen=""
-                        loading="lazy"
-                        referrerpolicy="no-referrer-when-downgrade">
-                    </iframe>
+                <div class="d-flex flex-wrap gap-2 mb-2">
+                    <span class="chip">{{ hotel.tipo }}</span>
+                    <span class="chip">{{ hotel.municipio.nombre }}</span>
                 </div>
-                {% endif %}
-                <a href="{% url 'reservar' hotel.id %}" class="btn btn-primary">Reservar</a>
+                <h1 class="h2 mb-2">{{ hotel.nombre }}</h1>
+                <p class="mb-2"><i class="bi bi-geo-alt-fill me-2"></i>{{ hotel.direccion }}</p>
+                <p class="text-muted mb-0">{{ hotel.descripcion }}</p>
             </div>
         </div>
+
+        <section class="mb-4">
+            <div class="filter-wrap p-3 p-md-4 mb-3">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-3">
+                        <label class="form-label mb-1">Capacidad mínima</label>
+                        <select id="capacityFilter" class="form-select">
+                            <option value="">Todas</option>
+                            <option value="1">1+ personas</option>
+                            <option value="2">2+ personas</option>
+                            <option value="3">3+ personas</option>
+                            <option value="4">4+ personas</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label mb-1">Servicio</label>
+                        <select id="serviceFilter" class="form-select">
+                            <option value="">Todos</option>
+                            <option value="desayuno">Con desayuno</option>
+                            <option value="parking">Con estacionamiento</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label mb-1">Ordenar precio</label>
+                        <select id="priceOrder" class="form-select">
+                            <option value="">Recomendado</option>
+                            <option value="asc">Menor a mayor</option>
+                            <option value="desc">Mayor a menor</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 d-grid">
+                        <button id="clearFilters" class="btn btn-outline-secondary">Limpiar filtros</button>
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="h4 mb-3">Opciones de habitaciones</h3>
+            <div id="roomsContainer" class="row g-3">
+                {% for habitacion in habitaciones %}
+                <div class="col-12 col-md-6 col-lg-4 room-item"
+                     data-capacidad="{{ habitacion.capacidad }}"
+                     data-precio="{{ habitacion.precio }}"
+                     data-desayuno="{% if habitacion.incluye_desayuno %}1{% else %}0{% endif %}"
+                     data-parking="{% if habitacion.estacionamiento %}1{% else %}0{% endif %}">
+                    <div class="room-card card h-100">
+                        {% if habitacion.imagen_static_url %}
+                        <img src="{{ habitacion.imagen_static_url }}" class="room-img card-img-top" alt="{{ habitacion.nombre }}">
+                        {% else %}
+                        <img src="https://via.placeholder.com/640x360?text=Habitaci%C3%B3n" class="room-img card-img-top" alt="{{ habitacion.nombre }}">
+                        {% endif %}
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title mb-1">{{ habitacion.nombre }}</h5>
+                            <p class="text-muted small mb-2">{{ habitacion.descripcion|default:"Habitación cómoda con excelente ubicación dentro del hotel." }}</p>
+                            <ul class="list-unstyled small mb-3">
+                                <li><i class="bi bi-people me-2"></i>{{ habitacion.capacidad }} persona(s)</li>
+                                {% if habitacion.camas %}<li><i class="bi bi-moon-stars me-2"></i>{{ habitacion.camas }}</li>{% endif %}
+                                {% if habitacion.metros_cuadrados %}<li><i class="bi bi-bounding-box me-2"></i>{{ habitacion.metros_cuadrados }} m²</li>{% endif %}
+                                {% if habitacion.incluye_desayuno %}<li><i class="bi bi-cup-hot me-2"></i>Desayuno incluido</li>{% endif %}
+                                {% if habitacion.estacionamiento %}<li><i class="bi bi-p-square me-2"></i>Estacionamiento</li>{% endif %}
+                            </ul>
+                            <div class="mt-auto d-flex align-items-center justify-content-between">
+                                <span class="price">$ {{ habitacion.precio }}</span>
+                                <a href="{% url 'reservar' hotel.id %}" class="btn btn-dark btn-sm">Reservar</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12">
+                    <div class="alert alert-info mb-0">Este hotel aún no tiene habitaciones cargadas. Puedes agregarlas desde el panel admin.</div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        {% if hotel.mapa_embed_src %}
+        <section class="mb-3">
+            <h3 class="h4 mb-3">Ubicación del hotel</h3>
+            <div class="map-card card">
+                <iframe
+                    src="{{ hotel.mapa_embed_src }}"
+                    width="100%"
+                    height="360"
+                    style="border:0;"
+                    allowfullscreen=""
+                    loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade">
+                </iframe>
+            </div>
+        </section>
+        {% endif %}
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const capacityFilter = document.getElementById('capacityFilter');
+            const serviceFilter = document.getElementById('serviceFilter');
+            const priceOrder = document.getElementById('priceOrder');
+            const clearFilters = document.getElementById('clearFilters');
+            const container = document.getElementById('roomsContainer');
+
+            if (!container) return;
+
+            function applyFilters() {
+                const items = Array.from(container.querySelectorAll('.room-item'));
+                const minCapacity = capacityFilter.value ? parseInt(capacityFilter.value, 10) : null;
+                const service = serviceFilter.value;
+
+                items.forEach(item => {
+                    const capacity = parseInt(item.dataset.capacidad || '0', 10);
+                    const desayuno = item.dataset.desayuno === '1';
+                    const parking = item.dataset.parking === '1';
+
+                    let visible = true;
+                    if (minCapacity !== null && capacity < minCapacity) visible = false;
+                    if (service === 'desayuno' && !desayuno) visible = false;
+                    if (service === 'parking' && !parking) visible = false;
+
+                    item.style.display = visible ? '' : 'none';
+                });
+
+                const order = priceOrder.value;
+                if (order) {
+                    const sorted = items.slice().sort((a, b) => {
+                        const pa = parseFloat(a.dataset.precio || '0');
+                        const pb = parseFloat(b.dataset.precio || '0');
+                        return order === 'asc' ? pa - pb : pb - pa;
+                    });
+                    sorted.forEach(item => container.appendChild(item));
+                }
+            }
+
+            [capacityFilter, serviceFilter, priceOrder].forEach(control => {
+                if (control) control.addEventListener('change', applyFilters);
+            });
+
+            if (clearFilters) {
+                clearFilters.addEventListener('click', function () {
+                    capacityFilter.value = '';
+                    serviceFilter.value = '';
+                    priceOrder.value = '';
+                    applyFilters();
+                });
+            }
+        });
+    </script>
 </body>
 </html>
