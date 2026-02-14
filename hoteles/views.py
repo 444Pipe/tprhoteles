@@ -19,9 +19,17 @@ def _build_static_image_url(path):
 	return f"{static_url}{quote(cleaned, safe='/')}"
 
 
+def _build_static_image_urls(raw_value):
+	if not raw_value:
+		return []
+	parts = [part.strip() for part in str(raw_value).split(',') if part.strip()]
+	return [_build_static_image_url(part) for part in parts]
+
+
 def _attach_static_urls(hoteles):
 	for hotel in hoteles:
-		hotel.imagen_static_url = _build_static_image_url(hotel.imagen_static)
+		hotel.imagen_static_urls = _build_static_image_urls(hotel.imagen_static)
+		hotel.imagen_static_url = hotel.imagen_static_urls[0] if hotel.imagen_static_urls else ''
 	return hoteles
 
 
@@ -72,17 +80,23 @@ def index(request):
 
 def hotel_detail(request, hotel_id):
 	hotel = get_object_or_404(Hotel, id=hotel_id)
-	hotel.imagen_static_url = _build_static_image_url(hotel.imagen_static)
+	hotel.imagen_static_urls = _build_static_image_urls(hotel.imagen_static)
+	hotel.imagen_static_url = hotel.imagen_static_urls[0] if hotel.imagen_static_urls else ''
 	habitaciones = list(hotel.habitaciones.filter(activa=True))
 	galeria_imagenes = []
-	if hotel.imagen_static_url:
+	if hotel.imagen_static_urls:
+		galeria_imagenes.extend(hotel.imagen_static_urls)
+	elif hotel.imagen_static_url:
 		galeria_imagenes.append(hotel.imagen_static_url)
 	elif hotel.imagen:
 		galeria_imagenes.append(hotel.imagen.url)
 
 	for habitacion in habitaciones:
-		habitacion.imagen_static_url = _build_static_image_url(habitacion.imagen_static)
-		if habitacion.imagen_static_url:
+		habitacion.imagen_static_urls = _build_static_image_urls(habitacion.imagen_static)
+		habitacion.imagen_static_url = habitacion.imagen_static_urls[0] if habitacion.imagen_static_urls else ''
+		if habitacion.imagen_static_urls:
+			galeria_imagenes.extend(habitacion.imagen_static_urls)
+		elif habitacion.imagen_static_url:
 			galeria_imagenes.append(habitacion.imagen_static_url)
 
 	# Deduplicar galería conservando orden

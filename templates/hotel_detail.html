@@ -12,6 +12,11 @@
         .top-card { background: #fff; border: 0; border-radius: 14px; box-shadow: 0 8px 22px rgba(0,0,0,.06); }
         .gallery-main { height: 360px; object-fit: cover; width: 100%; border-radius: 10px; }
         .gallery-thumb { height: 174px; object-fit: cover; width: 100%; border-radius: 10px; }
+        .hotel-carousel .carousel-item img { height: 360px; object-fit: cover; border-radius: 10px; width: 100%; }
+        .hotel-carousel .carousel-control-prev,
+        .hotel-carousel .carousel-control-next { width: 9%; }
+        .hotel-carousel .carousel-control-prev-icon,
+        .hotel-carousel .carousel-control-next-icon { background-color: rgba(0,0,0,.45); border-radius: 999px; padding: 12px; }
         .chip { border-radius: 999px; padding: .3rem .75rem; background: #fff3ce; color: #5f4c00; font-size: .85rem; font-weight: 600; }
         .section-nav { position: sticky; top: 10px; z-index: 10; background: #fff; border-radius: 12px; box-shadow: 0 5px 16px rgba(0,0,0,.05); }
         .section-nav a { color: #1b2a4e; font-weight: 600; text-decoration: none; padding: .8rem 1rem; display: inline-block; }
@@ -35,24 +40,39 @@
 
         <div class="top-card card p-3 p-md-4 mb-3">
             <div class="row g-3">
-                <div class="col-12 col-lg-6">
-                    {% if galeria_imagenes %}
-                    <img src="{{ galeria_imagenes.0 }}" class="gallery-main" alt="{{ hotel.nombre }}">
-                    {% else %}
-                    <img src="https://via.placeholder.com/900x520?text=Hotel" class="gallery-main" alt="{{ hotel.nombre }}">
-                    {% endif %}
-                </div>
-                <div class="col-12 col-lg-6">
-                    <div class="row g-3">
-                        {% for img in galeria_imagenes|slice:"1:5" %}
-                        <div class="col-6">
-                            <img src="{{ img }}" class="gallery-thumb" alt="Imagen de {{ hotel.nombre }}">
+                <div class="col-12">
+                    <div id="hotelGalleryCarousel" class="carousel slide hotel-carousel" data-bs-ride="carousel">
+                        <div class="carousel-indicators">
+                            {% for img in galeria_imagenes %}
+                            <button type="button" data-bs-target="#hotelGalleryCarousel" data-bs-slide-to="{{ forloop.counter0 }}" {% if forloop.first %}class="active" aria-current="true"{% endif %} aria-label="Slide {{ forloop.counter }}"></button>
+                            {% endfor %}
+                            {% if not galeria_imagenes %}
+                            <button type="button" data-bs-target="#hotelGalleryCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                            {% endif %}
                         </div>
-                        {% empty %}
-                        <div class="col-6"><img src="https://via.placeholder.com/450x260?text=Habitaci%C3%B3n" class="gallery-thumb" alt="Habitación"></div>
-                        <div class="col-6"><img src="https://via.placeholder.com/450x260?text=Servicios" class="gallery-thumb" alt="Servicios"></div>
-                        {% endfor %}
-                    </div>
+
+                        <div class="carousel-inner">
+                            {% for img in galeria_imagenes %}
+                            <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                <img src="{{ img }}" alt="Imagen {{ forloop.counter }} de {{ hotel.nombre }}">
+                            </div>
+                            {% empty %}
+                            <div class="carousel-item active">
+                                <img src="https://via.placeholder.com/1200x650?text=Galer%C3%ADa+del+hotel" alt="Galería del hotel">
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        {% if galeria_imagenes|length > 1 %}
+                        <button class="carousel-control-prev" type="button" data-bs-target="#hotelGalleryCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Anterior</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#hotelGalleryCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Siguiente</span>
+                        </button>
+                        {% endif %}
                 </div>
             </div>
         </div>
