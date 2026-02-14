@@ -1,3 +1,4 @@
+import re
 
 from django.db import models
 
@@ -16,6 +17,22 @@ class Hotel(models.Model):
 	descripcion = models.TextField()
 	imagen_static = models.CharField(max_length=255, blank=True, default='')
 	imagen = models.ImageField(upload_to='hoteles/', blank=True, null=True)
+	ubicacion_mapa = models.TextField(blank=True, default='')
+
+	@property
+	def mapa_embed_src(self):
+		value = (self.ubicacion_mapa or '').strip()
+		if not value:
+			return ''
+
+		match = re.search(r'''src=["']([^"']+)["']''', value)
+		if match:
+			return match.group(1)
+
+		if value.startswith('http://') or value.startswith('https://'):
+			return value
+
+		return ''
 
 	def __str__(self):
 		return self.nombre

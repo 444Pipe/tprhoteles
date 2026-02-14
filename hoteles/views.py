@@ -45,6 +45,16 @@ class ReservaForm(forms.ModelForm):
 		model = Reserva
 		fields = ['nombre_cliente', 'email', 'fecha', 'personas']
 
+
+class ReservaGeneralForm(forms.ModelForm):
+	class Meta:
+		model = Reserva
+		fields = ['hotel', 'nombre_cliente', 'email', 'fecha', 'personas']
+
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		self.fields['hotel'].queryset = Hotel.objects.all().order_by('nombre')
+
 def index(request):
 	municipios = Municipio.objects.all()
 	municipio_id = request.GET.get('municipio')
@@ -77,6 +87,17 @@ def reservar(request, hotel_id):
 	else:
 		form = ReservaForm()
 	return render(request, 'reservar.html', {'hotel': hotel, 'form': form})
+
+
+def reservar_general(request):
+	if request.method == 'POST':
+		form = ReservaGeneralForm(request.POST)
+		if form.is_valid():
+			reserva = form.save()
+			return render(request, 'reserva_exitosa.html', {'hotel': reserva.hotel, 'reserva': reserva})
+	else:
+		form = ReservaGeneralForm()
+	return render(request, 'reservar.html', {'hotel': None, 'form': form})
 
 
 def logout_view(request):

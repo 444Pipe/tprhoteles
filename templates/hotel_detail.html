@@ -21,6 +21,20 @@
                 <p class="card-text">{{ hotel.tipo }}</p>
                 <p class="card-text"><strong>Dirección:</strong> {{ hotel.direccion }}</p>
                 <p class="card-text">{{ hotel.descripcion }}</p>
+                {% if hotel.mapa_embed_src %}
+                <div class="mt-4">
+                    <h5 class="mb-3">Ubicación</h5>
+                    <iframe
+                        src="{{ hotel.mapa_embed_src }}"
+                        width="100%"
+                        height="320"
+                        style="border:0; border-radius: 10px;"
+                        allowfullscreen=""
+                        loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade">
+                    </iframe>
+                </div>
+                {% endif %}
                 <a href="{% url 'reservar' hotel.id %}" class="btn btn-primary">Reservar</a>
             </div>
         </div>

@@ -123,7 +123,7 @@
 			<div class="d-flex gap-3 hero-cta-group">
 				<a href="{% url 'hoteles_list' %}" class="btn btn-amarillo-tpr btn-lg fw-bold shadow js-hero-btn" style="min-width: 180px;">Ver Hoteles</a>
 				{% if hoteles %}
-				<a href="{% url 'reservar' hoteles.0.id %}" class="btn btn-outline-light btn-lg fw-bold shadow js-hero-btn js-hero-reservar" style="min-width: 180px;">Reservar Ahora</a>
+				<a href="{% url 'reservar_general' %}" class="btn btn-outline-light btn-lg fw-bold shadow js-hero-btn js-hero-reservar" style="min-width: 180px;">Reservar Ahora</a>
 				{% else %}
 				<a href="#" class="btn btn-outline-light btn-lg fw-bold shadow disabled js-hero-btn js-hero-reservar" style="min-width: 180px;">Reservar Ahora</a>
 				{% endif %}

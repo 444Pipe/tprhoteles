@@ -7,9 +7,14 @@ class MunicipioAdmin(admin.ModelAdmin):
 
 @admin.register(Hotel)
 class HotelAdmin(admin.ModelAdmin):
-	list_display = ('nombre', 'tipo', 'municipio', 'direccion', 'imagen_static')
+	list_display = ('nombre', 'tipo', 'municipio', 'direccion', 'imagen_static', 'tiene_mapa')
 	search_fields = ('nombre', 'municipio__nombre')
 	list_filter = ('municipio', 'tipo')
+
+	def tiene_mapa(self, obj):
+		return bool(obj.mapa_embed_src)
+	tiene_mapa.boolean = True
+	tiene_mapa.short_description = 'Mapa'
 
 @admin.register(Reserva)
 class ReservaAdmin(admin.ModelAdmin):

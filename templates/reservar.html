@@ -21,9 +21,19 @@
         </div>
     </nav>
     <div class="form-reserva mx-auto mt-5" style="max-width: 480px; background: #fff; border-radius: 16px; box-shadow: 0 2px 16px #0001; padding: 2rem;">
+        {% if hotel %}
         <h2 class="fw-bold mb-4 text-center">Reserva en {{ hotel.nombre }}</h2>
+        {% else %}
+        <h2 class="fw-bold mb-4 text-center">Reserva general</h2>
+        {% endif %}
         <form method="post">
             {% csrf_token %}
+            {% if not hotel %}
+            <div class="mb-3">
+                <label for="hotel" class="form-label">Hotel</label>
+                {{ form.hotel }}
+            </div>
+            {% endif %}
             <div class="mb-3">
                 <label for="nombre_cliente" class="form-label">Nombre completo</label>
                 {{ form.nombre_cliente }}
