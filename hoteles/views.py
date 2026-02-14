@@ -74,9 +74,32 @@ def hotel_detail(request, hotel_id):
 	hotel = get_object_or_404(Hotel, id=hotel_id)
 	hotel.imagen_static_url = _build_static_image_url(hotel.imagen_static)
 	habitaciones = list(hotel.habitaciones.filter(activa=True))
+	galeria_imagenes = []
+	if hotel.imagen_static_url:
+		galeria_imagenes.append(hotel.imagen_static_url)
+	elif hotel.imagen:
+		galeria_imagenes.append(hotel.imagen.url)
+
 	for habitacion in habitaciones:
 		habitacion.imagen_static_url = _build_static_image_url(habitacion.imagen_static)
-	return render(request, 'hotel_detail.html', {'hotel': hotel, 'habitaciones': habitaciones})
+		if habitacion.imagen_static_url:
+			galeria_imagenes.append(habitacion.imagen_static_url)
+
+	# Deduplicar galería conservando orden
+	galeria_imagenes = list(dict.fromkeys(galeria_imagenes))
+
+	precio_desde = None
+	if habitaciones:
+		precio_desde = min(habitacion.precio for habitacion in habitaciones)
+
+	context = {
+		'hotel': hotel,
+		'habitaciones': habitaciones,
+		'galeria_imagenes': galeria_imagenes,
+		'total_habitaciones': len(habitaciones),
+		'precio_desde': precio_desde,
+	}
+	return render(request, 'hotel_detail.html', context)
 
 def reservar(request, hotel_id):
 	hotel = get_object_or_404(Hotel, id=hotel_id)
