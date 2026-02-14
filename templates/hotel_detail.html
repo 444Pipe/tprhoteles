@@ -21,6 +21,7 @@
         .section-nav { position: sticky; top: 10px; z-index: 10; background: #fff; border-radius: 12px; box-shadow: 0 5px 16px rgba(0,0,0,.05); }
         .section-nav a { color: #1b2a4e; font-weight: 600; text-decoration: none; padding: .8rem 1rem; display: inline-block; }
         .section-nav a:hover { color: #0d6efd; }
+        .section-nav a.active { color: #0d6efd; background: #eef5ff; border-radius: 8px; }
         .soft-card { border: 0; border-radius: 12px; box-shadow: 0 5px 16px rgba(0,0,0,.05); }
         .room-card { border: 0; border-radius: 14px; box-shadow: 0 6px 18px rgba(0,0,0,.06); overflow: hidden; transition: transform .2s ease, box-shadow .2s ease; }
         .room-card:hover { transform: translateY(-3px); box-shadow: 0 10px 22px rgba(0,0,0,.08); }
@@ -57,6 +58,11 @@
         .details-expandable.expanded { max-height: 5000px; }
         .details-expandable.expanded::after { display: none; }
         .toggle-details-btn { font-weight: 600; }
+        .poi-item-extra { display: none; }
+        .poi-item-extra.show { display: list-item; }
+        .copy-address-btn { font-size: .78rem; }
+        .js-fade-in { opacity: 0; transform: translateY(10px); transition: opacity .45s ease, transform .45s ease; }
+        .js-fade-in.is-visible { opacity: 1; transform: translateY(0); }
     </style>
 </head>
 <body>
@@ -245,9 +251,10 @@
             </div>
 
             {% if hotel.municipio.nombre == "Castilla La Nueva" %}
-            <div class="soft-card card p-3 p-md-4 mt-3 details-rich">
+            <div class="soft-card card p-3 p-md-4 mt-3 details-rich js-fade-in">
                 <h4 class="h6 mb-2">Información de la zona</h4>
-                <p class="mb-2"><i class="bi bi-geo-alt-fill me-2"></i>calle 10#11a-09, Castilla La Nueva, Meta, 507041</p>
+                <p class="mb-2"><i class="bi bi-geo-alt-fill me-2"></i><span id="zoneAddress">calle 10#11a-09, Castilla La Nueva, Meta, 507041</span></p>
+                <button id="copyZoneAddress" type="button" class="btn btn-outline-secondary btn-sm copy-address-btn mb-2">Copiar dirección</button>
                 <p class="mb-3">
                     <a class="map-link" href="https://maps.google.com/?q=calle+10+11a-09,+Castilla+La+Nueva,+Meta" target="_blank" rel="noopener">Ver en el mapa</a>
                 </p>
@@ -257,15 +264,16 @@
                     <li>Parque Nuevo Milenio - 3 min a pie - 0.3 km</li>
                     <li>Iglesia Principal - 5 min a pie - 0.5 km</li>
                     <li>Casa de la Cultura de Castilla La Nueva - 5 min a pie - 0.5 km</li>
-                    <li>Balneario Caño Cacayal - 10 min en auto - 3.2 km</li>
-                    <li>Parque acuático Cacayal - 16 min en auto - 5.4 km</li>
+                    <li class="poi-item-extra">Balneario Caño Cacayal - 10 min en auto - 3.2 km</li>
+                    <li class="poi-item-extra">Parque acuático Cacayal - 16 min en auto - 5.4 km</li>
                 </ul>
+                <button id="togglePoiBtn" type="button" class="btn btn-link px-0 mt-2">Ver más puntos</button>
             </div>
             {% endif %}
         </section>
 
         <section id="politicas" class="mb-3">
-            <div class="soft-card card p-3 p-md-4">
+            <div class="soft-card card p-3 p-md-4 js-fade-in">
                 {% if hotel.municipio.nombre == "Castilla La Nueva" %}
                 <div class="details-rich">
                 <h3 class="h5 mb-3">Acerca de esta propiedad</h3>
@@ -448,6 +456,84 @@
                     const expanded = target.classList.contains('expanded');
                     this.textContent = expanded ? 'Ver menos información' : 'Ver más información';
                 });
+            }
+
+            const sectionNavLinks = Array.from(document.querySelectorAll('.section-nav a'));
+            const pageSections = sectionNavLinks
+                .map(link => document.querySelector(link.getAttribute('href')))
+                .filter(Boolean);
+
+            sectionNavLinks.forEach(link => {
+                link.addEventListener('click', function (event) {
+                    const targetSelector = this.getAttribute('href');
+                    const target = document.querySelector(targetSelector);
+                    if (!target) return;
+                    event.preventDefault();
+                    const topOffset = 78;
+                    const targetTop = target.getBoundingClientRect().top + window.scrollY - topOffset;
+                    window.scrollTo({ top: targetTop, behavior: 'smooth' });
+                });
+            });
+
+            function updateActiveSection() {
+                const checkpoint = window.scrollY + 120;
+                let currentId = '';
+                pageSections.forEach(section => {
+                    if (section.offsetTop <= checkpoint) {
+                        currentId = section.id;
+                    }
+                });
+                sectionNavLinks.forEach(link => {
+                    const isActive = link.getAttribute('href') === `#${currentId}`;
+                    link.classList.toggle('active', isActive);
+                });
+            }
+
+            if (pageSections.length) {
+                updateActiveSection();
+                window.addEventListener('scroll', updateActiveSection, { passive: true });
+            }
+
+            const copyZoneAddress = document.getElementById('copyZoneAddress');
+            const zoneAddress = document.getElementById('zoneAddress');
+            if (copyZoneAddress && zoneAddress) {
+                copyZoneAddress.addEventListener('click', async function () {
+                    const text = zoneAddress.textContent.trim();
+                    try {
+                        await navigator.clipboard.writeText(text);
+                        this.textContent = 'Dirección copiada';
+                    } catch (error) {
+                        this.textContent = 'No se pudo copiar';
+                    }
+                    setTimeout(() => {
+                        this.textContent = 'Copiar dirección';
+                    }, 1800);
+                });
+            }
+
+            const togglePoiBtn = document.getElementById('togglePoiBtn');
+            if (togglePoiBtn) {
+                const extraPoiItems = Array.from(document.querySelectorAll('.poi-item-extra'));
+                togglePoiBtn.addEventListener('click', function () {
+                    const shouldShow = extraPoiItems.some(item => !item.classList.contains('show'));
+                    extraPoiItems.forEach(item => item.classList.toggle('show', shouldShow));
+                    this.textContent = shouldShow ? 'Ver menos puntos' : 'Ver más puntos';
+                });
+            }
+
+            const revealTargets = document.querySelectorAll('.js-fade-in');
+            if (revealTargets.length && 'IntersectionObserver' in window) {
+                const revealObserver = new IntersectionObserver((entries, observer) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('is-visible');
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.15 });
+                revealTargets.forEach(element => revealObserver.observe(element));
+            } else {
+                revealTargets.forEach(element => element.classList.add('is-visible'));
             }
         });
     </script>
