@@ -1,5 +1,5 @@
 /* Estilos personalizados para el admin */
-html, body { background: #f5f6f8 !important; }
+html, body { background: var(--body-bg) !important; }
 body::before { display: none !important; }
 #header, #header + .module { background: rgba(255,255,255,0.03); }
 #content-main { background: transparent; }
