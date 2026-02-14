@@ -69,9 +69,33 @@
             bottom: 20px;
             z-index: 1080;
             border-radius: 999px;
-            padding: .8rem 1.1rem;
+            padding: 1rem 1.4rem;
             font-weight: 700;
-            box-shadow: 0 10px 24px rgba(0,0,0,.22);
+            font-size: 1.05rem;
+            box-shadow: 0 12px 28px rgba(0,0,0,.24);
+            transition: transform .2s ease, box-shadow .2s ease, opacity .2s ease;
+            animation: reservePulse 2.2s ease-in-out infinite;
+        }
+        .floating-reserve-btn:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 16px 30px rgba(0,0,0,.28);
+        }
+        .floating-reserve-btn.hide-on-scroll {
+            transform: translateY(90px);
+            opacity: .2;
+            pointer-events: none;
+            animation: none;
+        }
+        .floating-reserve-btn .reserve-icon {
+            display: inline-block;
+            transition: transform .2s ease;
+        }
+        .floating-reserve-btn:hover .reserve-icon {
+            transform: scale(1.15) rotate(-6deg);
+        }
+        @keyframes reservePulse {
+            0%, 100% { box-shadow: 0 12px 28px rgba(0,0,0,.24); }
+            50% { box-shadow: 0 16px 34px rgba(255, 193, 7, .42); }
         }
         @media (max-width: 767px) {
             .floating-reserve-btn {
@@ -79,6 +103,8 @@
                 left: 12px;
                 bottom: 12px;
                 text-align: center;
+                font-size: 1rem;
+                padding: .95rem 1.1rem;
             }
             body { padding-bottom: 84px; }
         }
@@ -88,7 +114,6 @@
     <div class="container py-4 py-md-5">
         <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
             <a href="{% url 'hoteles_list' %}" class="btn btn-outline-dark"><i class="bi bi-arrow-left me-2"></i>Volver a hoteles</a>
-            <a href="{% url 'reservar' hotel.id %}" class="btn btn-warning fw-bold">Reservar ahora</a>
         </div>
 
         <div class="top-card card p-3 p-md-4 mb-3">
@@ -410,13 +435,15 @@
         </section>
     </div>
 
-    <a href="{% url 'reservar' hotel.id %}" class="btn btn-warning floating-reserve-btn">
-        <i class="bi bi-calendar-check me-2"></i>Reservar ahora
+    <a id="floatingReserveBtn" href="{% url 'reservar' hotel.id %}" class="btn btn-warning floating-reserve-btn" aria-label="Reservar ahora">
+        <i class="bi bi-calendar-check me-2 reserve-icon"></i><span id="floatingReserveText">Reservar ahora</span>
     </a>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            const floatingReserveBtn = document.getElementById('floatingReserveBtn');
+            const floatingReserveText = document.getElementById('floatingReserveText');
             const capacityFilter = document.getElementById('capacityFilter');
             const serviceFilter = document.getElementById('serviceFilter');
             const priceOrder = document.getElementById('priceOrder');
@@ -557,6 +584,34 @@
                 revealTargets.forEach(element => revealObserver.observe(element));
             } else {
                 revealTargets.forEach(element => element.classList.add('is-visible'));
+            }
+
+            if (floatingReserveBtn) {
+                let lastScrollY = window.scrollY;
+                let textSwapped = false;
+
+                window.addEventListener('scroll', () => {
+                    const currentY = window.scrollY;
+                    const scrollingDown = currentY > lastScrollY;
+
+                    if (currentY > 220 && scrollingDown) {
+                        floatingReserveBtn.classList.add('hide-on-scroll');
+                    } else {
+                        floatingReserveBtn.classList.remove('hide-on-scroll');
+                    }
+
+                    if (floatingReserveText) {
+                        if (currentY > 260 && !textSwapped) {
+                            floatingReserveText.textContent = 'Reserva aquí';
+                            textSwapped = true;
+                        } else if (currentY <= 260 && textSwapped) {
+                            floatingReserveText.textContent = 'Reservar ahora';
+                            textSwapped = false;
+                        }
+                    }
+
+                    lastScrollY = currentY;
+                }, { passive: true });
             }
         });
     </script>
