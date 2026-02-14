@@ -31,18 +31,29 @@
             text-align: center;
             padding: 1.2rem;
         }
+        .hero-text-card {
+            background: rgba(255, 255, 255, .62);
+            border: 1px solid rgba(255, 255, 255, .75);
+            border-radius: 14px;
+            padding: .8rem 1.25rem;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            box-shadow: 0 6px 18px rgba(0,0,0,.08);
+        }
         .hero-title {
-            font-size: clamp(1.6rem, 4vw, 3rem);
-            font-weight: 800;
-            color: #071a40;
+            font-size: clamp(1.5rem, 3.5vw, 2.6rem);
+            font-weight: 700;
+            color: #0b2557;
             margin: 0;
-            text-shadow: 0 2px 6px rgba(255,255,255,.45);
+            letter-spacing: .2px;
+            line-height: 1.15;
+            text-shadow: none;
         }
         .hero-subtitle {
-            margin-top: .35rem;
-            color: #9c6b26;
-            font-size: clamp(.95rem, 1.8vw, 1.35rem);
-            font-weight: 600;
+            margin-top: .25rem;
+            color: #8d611f;
+            font-size: clamp(.92rem, 1.5vw, 1.1rem);
+            font-weight: 500;
         }
         .gallery-thumb { height: 174px; object-fit: cover; width: 100%; border-radius: 10px; }
         .room-carousel .carousel-item img { height: 170px; object-fit: cover; width: 100%; }
@@ -81,8 +92,10 @@
                 <img src="https://via.placeholder.com/1200x650?text=Hotel" alt="{{ hotel.nombre }}" class="gallery-main">
                 {% endif %}
                 <div class="hero-overlay">
-                    <h1 class="hero-title">{{ hotel.nombre }}</h1>
-                    <div class="hero-subtitle">{{ hotel.tipo }} • {{ hotel.municipio.nombre }}</div>
+                    <div class="hero-text-card">
+                        <h1 class="hero-title">{{ hotel.nombre }}</h1>
+                        <div class="hero-subtitle">{{ hotel.tipo }} • {{ hotel.municipio.nombre }}</div>
+                    </div>
                 </div>
             </div>
         </div>
