@@ -29,6 +29,34 @@
         .filter-wrap { background: #fff; border-radius: 12px; box-shadow: 0 4px 14px rgba(0,0,0,.05); }
         .map-card { border: 0; border-radius: 14px; overflow: hidden; box-shadow: 0 8px 20px rgba(0,0,0,.06); }
         .service-list li { margin-bottom: .4rem; }
+        .details-rich { color: #2f3a48; line-height: 1.62; }
+        .details-rich h4 { color: #1b2a4e; font-weight: 700; margin-top: .25rem; }
+        .details-rich h5 { color: #3f4e68; letter-spacing: .15px; text-transform: uppercase; }
+        .details-rich ul { padding-left: 1.2rem; margin-bottom: .9rem; }
+        .details-rich li { margin-bottom: .35rem; }
+        .details-rich .info-block { background: #fafbfd; border: 1px solid #e8edf4; border-radius: 10px; padding: .9rem 1rem; margin-bottom: .85rem; }
+        .details-rich .poi-list li::marker { color: #7a8ca8; }
+        .details-rich .map-link { font-weight: 600; text-decoration: none; }
+        .details-rich .map-link:hover { text-decoration: underline; }
+        .details-expandable {
+            max-height: 250px;
+            overflow: hidden;
+            position: relative;
+            transition: max-height .35s ease;
+        }
+        .details-expandable::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 80px;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,1));
+            pointer-events: none;
+        }
+        .details-expandable.expanded { max-height: 5000px; }
+        .details-expandable.expanded::after { display: none; }
+        .toggle-details-btn { font-weight: 600; }
     </style>
 </head>
 <body>
@@ -217,22 +245,21 @@
             </div>
 
             {% if hotel.municipio.nombre == "Castilla La Nueva" %}
-            <div class="soft-card card p-3 p-md-4 mt-3">
+            <div class="soft-card card p-3 p-md-4 mt-3 details-rich">
                 <h4 class="h6 mb-2">Información de la zona</h4>
                 <p class="mb-2"><i class="bi bi-geo-alt-fill me-2"></i>calle 10#11a-09, Castilla La Nueva, Meta, 507041</p>
                 <p class="mb-3">
-                    <a href="https://maps.google.com/?q=calle+10+11a-09,+Castilla+La+Nueva,+Meta" target="_blank" rel="noopener">Ver en el mapa</a>
+                    <a class="map-link" href="https://maps.google.com/?q=calle+10+11a-09,+Castilla+La+Nueva,+Meta" target="_blank" rel="noopener">Ver en el mapa</a>
                 </p>
 
                 <h5 class="h6 mb-2">Puntos de interés</h5>
-                <ul class="mb-0">
+                <ul class="mb-0 poi-list">
                     <li>Parque Nuevo Milenio - 3 min a pie - 0.3 km</li>
                     <li>Iglesia Principal - 5 min a pie - 0.5 km</li>
                     <li>Casa de la Cultura de Castilla La Nueva - 5 min a pie - 0.5 km</li>
                     <li>Balneario Caño Cacayal - 10 min en auto - 3.2 km</li>
                     <li>Parque acuático Cacayal - 16 min en auto - 5.4 km</li>
                 </ul>
-                <div class="small text-muted mt-2">Ver más</div>
             </div>
             {% endif %}
         </section>
@@ -240,10 +267,14 @@
         <section id="politicas" class="mb-3">
             <div class="soft-card card p-3 p-md-4">
                 {% if hotel.municipio.nombre == "Castilla La Nueva" %}
+                <div class="details-rich">
                 <h3 class="h5 mb-3">Acerca de esta propiedad</h3>
+                <div class="info-block">
                 <h4 class="h6 mb-2">TPR Castilla Hotel Boutique</h4>
-                <p>Disfruta de tu visita a Castilla la Nueva en TPR Castilla Hotel Boutique. Puedes disfrutar de un trago en el bar o comer algo rico en la cafetería.</p>
+                <p class="mb-0">Disfruta de tu visita a Castilla la Nueva en TPR Castilla Hotel Boutique. Puedes disfrutar de un trago en el bar o comer algo rico en la cafetería.</p>
+                </div>
 
+                <div class="info-block">
                 <h4 class="h6 mb-2">Datos generales</h4>
                 <ul>
                     <li>Tamaño del hotel: 26 habitaciones</li>
@@ -251,10 +282,13 @@
                     <li>Edad mínima para hacer el check-in: 18</li>
                     <li>Check-out: 13:00</li>
                 </ul>
-                <div class="small text-muted mb-3">Ver más</div>
+                </div>
 
                 <p class="small text-muted">*Consultar Cargos y políticas para ver más detalles y cargos adicionales.</p>
 
+                <div id="castillaDetailsMore" class="details-expandable">
+
+                <div class="info-block">
                 <h4 class="h6 mb-2">Servicios en la propiedad</h4>
                 <h5 class="small fw-semibold mb-1">Alimentos y bebidas</h5>
                 <ul>
@@ -272,8 +306,9 @@
                     <li>Servicios de concierge</li>
                     <li>Servicio de tintorería/lavandería</li>
                 </ul>
-                <div class="small text-muted mb-3">Ver todos los servicios de la propiedad</div>
+                </div>
 
+                <div class="info-block">
                 <h4 class="h6 mb-2">Servicios de la habitación</h4>
                 <h5 class="small fw-semibold mb-1">Entretenimiento</h5>
                 <ul>
@@ -286,8 +321,9 @@
                     <li>Aire acondicionado</li>
                     <li>Tabla de planchar/plancha (previa solicitud)</li>
                 </ul>
-                <div class="small text-muted mb-3">Ver todos los servicios de las habitaciones</div>
+                </div>
 
+                <div class="info-block">
                 <h4 class="h6 mb-2">Cargos y políticas</h4>
                 <h5 class="small fw-semibold mb-1">Cargos obligatorios</h5>
                 <p class="mb-2">En el momento del check-in o check-out en la propiedad, deberás pagar los siguientes cargos, que podrían incluir los impuestos aplicables:</p>
@@ -310,7 +346,9 @@
                     <li>TPR Castilla Hotel Boutique Castilla la Nueva</li>
                     <li>TPR Castilla Hotel Boutique Hotel Castilla la Nueva</li>
                 </ul>
+                </div>
 
+                <div class="info-block mb-0">
                 <h4 class="h6 mb-2">Preguntas frecuentes</h4>
                 <p class="mb-1"><strong>¿Se aceptan mascotas en TPR Castilla Hotel Boutique?</strong></p>
                 <p>No se permiten mascotas ni animales de servicio.</p>
@@ -318,6 +356,11 @@
                 <p>Horario de check-in: 12:00-cualquier hora del día. Check-out: 13:00.</p>
                 <p class="mb-1"><strong>¿Hay restaurantes en TPR Castilla Hotel Boutique o en los alrededores?</strong></p>
                 <p class="mb-0">Sí, hay un restaurante en la propiedad.</p>
+                </div>
+
+                </div>
+                <button id="toggleCastillaDetails" type="button" class="btn btn-outline-dark btn-sm mt-3 toggle-details-btn" data-target="castillaDetailsMore">Ver más información</button>
+                </div>
                 {% else %}
                 <h3 class="h5 mb-3">Políticas y datos generales</h3>
                 <div class="row g-3">
@@ -349,9 +392,8 @@
             const clearFilters = document.getElementById('clearFilters');
             const container = document.getElementById('roomsContainer');
 
-            if (!container) return;
-
             function applyFilters() {
+                if (!container) return;
                 const items = Array.from(container.querySelectorAll('.room-item'));
                 const minCapacity = capacityFilter.value ? parseInt(capacityFilter.value, 10) : null;
                 const service = serviceFilter.value;
@@ -380,16 +422,31 @@
                 }
             }
 
-            [capacityFilter, serviceFilter, priceOrder].forEach(control => {
-                if (control) control.addEventListener('change', applyFilters);
-            });
+            if (container) {
+                [capacityFilter, serviceFilter, priceOrder].forEach(control => {
+                    if (control) control.addEventListener('change', applyFilters);
+                });
 
-            if (clearFilters) {
-                clearFilters.addEventListener('click', function () {
-                    capacityFilter.value = '';
-                    serviceFilter.value = '';
-                    priceOrder.value = '';
-                    applyFilters();
+                if (clearFilters) {
+                    clearFilters.addEventListener('click', function () {
+                        capacityFilter.value = '';
+                        serviceFilter.value = '';
+                        priceOrder.value = '';
+                        applyFilters();
+                    });
+                }
+            }
+
+            const toggleCastillaDetails = document.getElementById('toggleCastillaDetails');
+            if (toggleCastillaDetails) {
+                toggleCastillaDetails.addEventListener('click', function () {
+                    const targetId = this.dataset.target;
+                    const target = document.getElementById(targetId);
+                    if (!target) return;
+
+                    target.classList.toggle('expanded');
+                    const expanded = target.classList.contains('expanded');
+                    this.textContent = expanded ? 'Ver menos información' : 'Ver más información';
                 });
             }
         });
