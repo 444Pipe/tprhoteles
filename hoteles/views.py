@@ -1,3 +1,30 @@
+from urllib.parse import quote
+
+from django.conf import settings
+from django.shortcuts import render, get_object_or_404, redirect
+from django import forms
+from django.contrib.auth import logout
+from django.contrib import messages
+
+from .models import Hotel, Municipio, Reserva
+
+
+def _build_static_image_url(path):
+	if not path:
+		return ''
+	cleaned = path.strip().replace('\\', '/').lstrip('/')
+	if cleaned.startswith('static/'):
+		cleaned = cleaned[len('static/'):]
+	static_url = settings.STATIC_URL if settings.STATIC_URL.endswith('/') else f"{settings.STATIC_URL}/"
+	return f"{static_url}{quote(cleaned, safe='/')}"
+
+
+def _attach_static_urls(hoteles):
+	for hotel in hoteles:
+		hotel.imagen_static_url = _build_static_image_url(hotel.imagen_static)
+	return hoteles
+
+
 def hoteles_list(request):
 	municipios = Municipio.objects.all()
 	municipio_id = request.GET.get('municipio')
@@ -6,18 +33,12 @@ def hoteles_list(request):
 	if municipio_id:
 		hoteles = hoteles.filter(municipio_id=municipio_id)
 		municipio_seleccionado = int(municipio_id)
+	hoteles = _attach_static_urls(hoteles)
 	return render(request, 'hoteles_list.html', {
 		'municipios': municipios,
 		'hoteles': hoteles,
 		'municipio_seleccionado': municipio_seleccionado
 	})
-
-
-from django.shortcuts import render, get_object_or_404, redirect
-from .models import Hotel, Municipio, Reserva
-from django import forms
-from django.contrib.auth import logout
-from django.contrib import messages
 
 class ReservaForm(forms.ModelForm):
 	class Meta:
@@ -32,6 +53,7 @@ def index(request):
 	if municipio_id:
 		hoteles = hoteles.filter(municipio_id=municipio_id)
 		municipio_seleccionado = int(municipio_id)
+	hoteles = _attach_static_urls(hoteles)
 	return render(request, 'index.html', {
 		'municipios': municipios,
 		'hoteles': hoteles,
@@ -40,6 +62,7 @@ def index(request):
 
 def hotel_detail(request, hotel_id):
 	hotel = get_object_or_404(Hotel, id=hotel_id)
+	hotel.imagen_static_url = _build_static_image_url(hotel.imagen_static)
 	return render(request, 'hotel_detail.html', {'hotel': hotel})
 
 def reservar(request, hotel_id):
