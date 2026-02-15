@@ -258,9 +258,8 @@
                                 {% if habitacion.incluye_desayuno %}<li><i class="bi bi-cup-hot me-2"></i>Desayuno incluido</li>{% endif %}
                                 {% if habitacion.estacionamiento %}<li><i class="bi bi-p-square me-2"></i>Estacionamiento</li>{% endif %}
                             </ul>
-                            <div class="mt-auto d-flex align-items-center justify-content-between">
+                            <div class="mt-auto">
                                 <span class="price">$ {{ habitacion.precio }}</span>
-                                <a href="{% url 'reservar' hotel.id %}" class="btn btn-dark btn-sm">Ver precio</a>
                             </div>
                         </div>
                     </div>
